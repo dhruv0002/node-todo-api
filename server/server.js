@@ -54,6 +54,14 @@ app.post('/todos', (req, res) => {
     });
 });
 
+app.get('/todos', (req, res) => {
+    Todo.find().then((todos) => {
+        res.send({todos});//passing in array in an object give you more flexibility for future, so that you can define more propertise with it.
+    }, (e) => {
+        res.status(400).send(e);
+    });
+});
+
 app.listen(3000, () => {
     console.log('Started on port 3000');
 });
