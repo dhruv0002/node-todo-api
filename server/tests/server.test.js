@@ -18,7 +18,7 @@ beforeEach((done) => {
 
 beforeEach((done) => {
     Todo.remove({}).then(() => {
-        return Todo.insertMany(todos);
+        Todo.insertMany(todos);//automatically returns a promise so no need of adding 'return'.
     }).then(() => done());
 });
 
