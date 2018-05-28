@@ -1,5 +1,6 @@
-var express = require('express');
-var bodyParser = require('body-parser');
+const _ = require('lodash');
+const express = require('express');
+const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
 
 var {mongoose} = require('./db/mongoose.js');
@@ -105,9 +106,42 @@ app.delete('/todos/:id', (req, res) => {
     });
 });
 
+//patch is used to update the database
+app.patch('/todos/:id', (req, res) => {
+    var id = req.params.id;
+    var body = _.pick(req.body, ['text', 'completed']);//it will only pick text and completed property from the body object, as we cant allow user to manipulate any values other than that.
+
+    if(!ObjectID.isValid(id))
+    {
+        return res.status(404).send();
+    }
+
+    if(_.isBoolean(body.completed) && body.completed)
+    {
+        body.completedAt = new Date().getTime();//it will return number of milliseconds after 1st jan 1970 midnight. If its in negetive its before 1st jan 1970 midnight and if positive its after 1st jan 1970 midnight.
+
+    }
+    else
+    {
+        body.completed = false;
+        body.completedAt = null;
+    }
+
+    Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+        if(!todo)
+        {
+            return res.status(404).send();
+        }
+
+        res.send({todo});
+    }).catch((e) => {
+        res.status(400).send();
+    });
+
+});
+
 app.listen(port, () => {
     console.log(`Started on port ${port}`);
 });
 
 module.exports = {app};
-
