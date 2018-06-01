@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 var validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
 
 var UserSchema = new mongoose.Schema({
     Email: {
@@ -79,6 +80,24 @@ UserSchema.statics.findByToken = function (token) {
     });
 
 };//statics is an object which is a model method, anything you add to this object becomes a model method.
+
+//mongoose middlware is use to run a code before or after a certain operation, eg, update.
+//pre is to run the mongoose middleware before any event.
+UserSchema.pre('save', function (next) {
+    var user = this;
+
+    if (user.isModified('password')) {
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(user.password, salt, (err, res) => {
+                user.password = res;
+                next();
+            })
+        });
+    } else {
+        next();
+    }
+
+});
 
 var User = mongoose.model('User', UserSchema);
 

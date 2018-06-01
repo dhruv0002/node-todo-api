@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 
+//mongoose middlware is use to run a code before or after a certain operation, eg, update.
 var Todo = mongoose.model('Todo', {
     text: {
         type: String,
