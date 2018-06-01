@@ -8,6 +8,7 @@ const {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose.js');
 var {Todo} = require('./models/todo.js');
 var {User} = require('./models/user.js');
+var {authenticate} = require('./middleware/authenticate');
 
 /*
 var newTodo = new Todo({
@@ -161,12 +162,32 @@ app.post('/users', (req, res) => {
         return user.generateAuthToken();
         //res.send(doc);
     }).then((token) => {
-        res.header('x-auth', token).send(user);
+        res.header('x-auth', token).send(user);//res.header help us set the header
     }).catch((e) => {
         res.status(400).send(e);
     });
 
 });
+
+app.get('/users/me', authenticate, (req, res) => {
+    res.send(req.user);
+});
+
+/*
+app.get('/users/me', (req, res) => {
+    var token = req.header('x-auth');//this is gonna grab header and pass it to the token
+    
+    User.findByToken(token).then((user) => {
+        if (!user) {
+            return Promise.reject();
+        }
+
+        res.send(user);
+    }).catch((e) => {
+        res.status(401).send();
+    })
+});
+*/
 
 app.listen(port, () => {
     console.log(`Started on port ${port}`);
