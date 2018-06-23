@@ -81,6 +81,26 @@ UserSchema.statics.findByToken = function (token) {
 
 };//statics is an object which is a model method, anything you add to this object becomes a model method.
 
+UserSchema.statics.findByCredentials = function (email, password) {
+    var User = this;
+
+    return User.findOne({'Email': email}).then((user) => {
+        if(!user) {
+            return Promise.reject();
+        }
+
+        return new Promise((resolve, reject) => {
+            bcrypt.compare(password, user.password, (err, res) => {
+                if(res) {
+                    resolve(user);
+                } else {
+                    reject();
+                }
+            });
+        });
+    });
+};
+
 //mongoose middlware is use to run a code before or after a certain operation, eg, update.
 //pre is to run the mongoose middleware before any event.
 UserSchema.pre('save', function (next) {
