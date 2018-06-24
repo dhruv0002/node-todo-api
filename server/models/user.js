@@ -57,6 +57,18 @@ UserSchema.methods.generateAuthToken = function () {
     });
 };//methods  is an object and on this object we can add any custom method(instanced method), instance method have access to indivisual document.
 
+UserSchema.methods.removeToken = function (token) {
+    //pull let us remove certain item from array that match certain criteria
+    var user = this;
+
+    //pull let us remove certain item from array that match certain criteria
+    return user.update({
+        $pull: {
+            tokens: {token}
+        }
+    });
+};
+
 UserSchema.statics.findByToken = function (token) {
     var User = this;//model method are called with the model as our this binidng
     var decoded;
