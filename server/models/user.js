@@ -48,7 +48,7 @@ UserSchema.methods.toJSON = function () {
 UserSchema.methods.generateAuthToken = function () {
     var user = this;//we used normal function to use binding functionality, now when we are going to call this instance method like 'user.generateAuthToken' then our user variable will point to that user. Instance method are with the indivisual document.
     var access = 'auth';
-    var token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
+    var token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_secret).toString();
 
     user.tokens.push({access, token});
 
@@ -74,7 +74,7 @@ UserSchema.statics.findByToken = function (token) {
     var decoded;
 
     try {
-        decoded = jwt.verify(token, 'abc123');
+        decoded = jwt.verify(token, process.env.JWT_secret);
     } catch (e) {
         /*
         return new Promise((resolve, reject) => {
